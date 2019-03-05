@@ -27,8 +27,11 @@ task getCheckstyle {
     doLast {
         // check if the config dir was created yet
         def checkstyleConfigDir = new File(checkstyleConfigDir)
-        if (!checkstyleConfigDir.exists()) {
-            checkstyleConfigDir.mkdirs()
+        if (!checkstyleConfigDir.exists() && !checkstyleConfigDir.mkdirs()) {
+            throw new StopActionException("failed to create directory ${checkstyleConfigDir}")
+        }
+        if (!checkstyleConfigDir.with { isDirectory() && canRead() && canExecute() }) {
+            throw new StopActionException("failed to access directory ${checkstyleConfigDir}")
         }
 
         // save the remote file down if it doesn't exist
